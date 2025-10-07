@@ -127,7 +127,7 @@ For each row in your CSV, the script:
 🎉 **Successfully tested with both CSV types!**
 
 ### 🔧 Maintenance Test
-- ✅ Created sub-task: BM-5672
+- ✅ Created sub-task: BM-****
 - 📝 Summary: "Install Minio cluster with 3 nodes by using Operator"
 - ⏱️ Original Estimate: 3h
 - ✅ Status: Set to "Done"
@@ -137,7 +137,7 @@ For each row in your CSV, the script:
 - 🏷️ Labels: DevOps
 
 ### 💻 Development Test
-- ✅ Created sub-task: BM-5673
+- ✅ Created sub-task: BM-****
 - 📝 Summary: "Generate and analyze SLA compliance reports"
 - ⏱️ Original Estimate: 2h
 - ✅ Status: Set to "Done"
