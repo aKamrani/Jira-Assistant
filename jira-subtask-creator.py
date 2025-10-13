@@ -9,15 +9,15 @@ The parent issue key is automatically determined based on the CSV filename:
 - Files containing 'maintenance' -> uses MAINTENANCE_PARENT_ISSUE_KEY
 - Files containing 'develop' -> uses DEVELOP_PARENT_ISSUE_KEY
 
-Usage: python jira-subtask-creator.py <input_file.csv>
+Usage: python jira-subtask-creator.py <input_file.yaml>
 Examples:
-  python jira-subtask-creator.py maintenance-subtasks.csv
-  python jira-subtask-creator.py develop-subtasks.csv
+  python jira-subtask-creator.py maintenance-subtasks.yaml
+  python jira-subtask-creator.py develop-subtasks.yaml
 """
 
 import sys
 import os
-import csv
+import yaml
 import time
 import re
 from datetime import datetime, timedelta
@@ -62,9 +62,9 @@ class JiraSubtaskCreatorV2:
         self.devops_component_id = None
         self.subtask_issue_type_id = None
     
-    def determine_parent_issue_key(self, csv_filename):
-        """Determine parent issue key based on CSV filename"""
-        filename_lower = csv_filename.lower()
+    def determine_parent_issue_key(self, yaml_filename):
+        """Determine parent issue key based on YAML filename"""
+        filename_lower = yaml_filename.lower()
         
         if 'maintenance' in filename_lower:
             self.parent_issue_key = self.maintenance_parent_key
@@ -303,7 +303,7 @@ class JiraSubtaskCreatorV2:
         return False
     
     def process_tasks(self, input_file):
-        """Process all tasks from the input file"""
+        """Process all tasks from the input YAML file"""
         if not os.path.exists(input_file):
             print(f"Input file {input_file} not found")
             return
@@ -319,37 +319,53 @@ class JiraSubtaskCreatorV2:
         
         created_tasks = []
         
-        with open(input_file, 'r', newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            
-            for row in reader:
-                summary = row['Summary'].strip()
-                original_estimate = row['Original Estimate'].strip()
+        try:
+            with open(input_file, 'r', encoding='utf-8') as yamlfile:
+                data = yaml.safe_load(yamlfile)
                 
-                if not summary or not original_estimate:
-                    print(f"Skipping row with missing data: {row}")
-                    continue
+                if not data or 'tasks' not in data:
+                    print("No tasks found in YAML file or invalid format")
+                    return
                 
-                print(f"\nProcessing: {summary}")
+                tasks = data['tasks']
+                if not tasks:
+                    print("No tasks to process")
+                    return
                 
-                # Create sub-task
-                issue_key = self.create_subtask(summary, original_estimate)
-                if issue_key:
-                    created_tasks.append(issue_key)
+                for task in tasks:
+                    summary = task.get('summary', '').strip()
+                    original_estimate = task.get('original_estimate', '').strip()
                     
-                    # Wait a moment before logging work
-                    time.sleep(2)
+                    if not summary or not original_estimate:
+                        print(f"Skipping task with missing data: {task}")
+                        continue
                     
-                    # Log work
-                    if self.log_work(issue_key, original_estimate, summary):
-                        # Wait a moment before setting status
+                    print(f"\nProcessing: {summary}")
+                    
+                    # Create sub-task
+                    issue_key = self.create_subtask(summary, original_estimate)
+                    if issue_key:
+                        created_tasks.append(issue_key)
+                        
+                        # Wait a moment before logging work
                         time.sleep(2)
                         
-                        # Set status to Done
-                        self.set_status_to_done(issue_key)
-                
-                # Wait between tasks to avoid rate limiting
-                time.sleep(3)
+                        # Log work
+                        if self.log_work(issue_key, original_estimate, summary):
+                            # Wait a moment before setting status
+                            time.sleep(2)
+                            
+                            # Set status to Done
+                            self.set_status_to_done(issue_key)
+                    
+                    # Wait between tasks to avoid rate limiting
+                    time.sleep(3)
+        except yaml.YAMLError as e:
+            print(f"Error parsing YAML file: {e}")
+            return
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            return
         
         print(f"\nCompleted processing. Created {len(created_tasks)} sub-tasks:")
         for task in created_tasks:
@@ -357,10 +373,10 @@ class JiraSubtaskCreatorV2:
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python jira-subtask-creator.py <input_file.csv>")
+        print("Usage: python jira-subtask-creator.py <input_file.yaml>")
         print("Examples:")
-        print("  python jira-subtask-creator.py maintenance-subtasks.csv")
-        print("  python jira-subtask-creator.py develop-subtasks.csv")
+        print("  python jira-subtask-creator.py maintenance-subtasks.yaml")
+        print("  python jira-subtask-creator.py develop-subtasks.yaml")
         sys.exit(1)
     
     input_file = sys.argv[1]

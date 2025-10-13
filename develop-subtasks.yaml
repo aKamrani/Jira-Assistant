@@ -1,0 +1,3 @@
+tasks:
+  - summary: "Releasing and Documenting Argo Workflow with video example for Develop team usage on https://git.banimode.com/i.bazm/banimode-apis-gateway/tree/laravel-upgrade-11/manifests/cronjobs-prod/Argo%20Workflow%20Examples"
+    original_estimate: "3h"

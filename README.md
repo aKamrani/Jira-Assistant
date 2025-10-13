@@ -2,11 +2,11 @@
 
 > **Automate your Jira workflow with style!** 🎯
 
-This Python script automates the creation of Jira sub-tasks and work logging for different types of projects. It intelligently detects the parent issue based on your CSV filename and uses the official Jira REST API for reliable operation.
+This Python script automates the creation of Jira sub-tasks and work logging for different types of projects. It intelligently detects the parent issue based on your YAML filename and uses the official Jira REST API for reliable operation.
 
 ## ✨ Features
 
-- 🎯 **Smart Parent Detection**: Automatically chooses the right parent issue based on CSV filename
+- 🎯 **Smart Parent Detection**: Automatically chooses the right parent issue based on YAML filename
 - 👤 **Auto-Assignment**: Assigns all tasks to Amirhossein Kamrani
 - 🏷️ **Auto-Labeling**: Sets Components and Labels to "DevOps"
 - ⏱️ **Time Tracking**: Logs work with the same time as original estimate
@@ -17,7 +17,7 @@ This Python script automates the creation of Jira sub-tasks and work logging for
 
 ## 🎯 Parent Issue Detection
 
-The script automatically detects which parent issue to use based on your CSV filename:
+The script automatically detects which parent issue to use based on your YAML filename:
 
 | 📁 Filename Contains | 🎯 Parent Issue Key | 📝 Description |
 |---------------------|-------------------|----------------|
@@ -58,46 +58,51 @@ DEVELOP_PARENT_ISSUE_KEY=PROJECT-5678
 
 ### 📋 Basic Usage
 ```bash
-python3 jira-subtask-creator.py <input_file.csv>
+python3 jira-subtask-creator.py <input_file.yaml>
 ```
 
 ### 📝 Examples
 ```bash
 # For maintenance tasks
-python3 jira-subtask-creator.py maintenance-subtasks.csv
+python3 jira-subtask-creator.py maintenance-subtasks.yaml
 
 # For development tasks  
-python3 jira-subtask-creator.py develop-subtasks.csv
+python3 jira-subtask-creator.py develop-subtasks.yaml
 
 # Any filename with 'maintenance' in it
-python3 jira-subtask-creator.py my-maintenance-tasks.csv
+python3 jira-subtask-creator.py my-maintenance-tasks.yaml
 
 # Any filename with 'develop' in it
-python3 jira-subtask-creator.py new-develop-features.csv
+python3 jira-subtask-creator.py new-develop-features.yaml
 ```
 
 ## 📊 Input File Format
 
-Your CSV file should have these columns:
+Your YAML file should follow this structure:
 
-| Column | Description | Example |
-|--------|-------------|---------|
-| `Summary` | Task description | "Install K8S on local nodes for test" |
-| `Original Estimate` | Time estimate | "6h", "4h 30m", "2d", "1w" |
+| Field | Description | Example |
+|-------|-------------|---------|
+| `summary` | Task description | "Install K8S on local nodes for test" |
+| `original_estimate` | Time estimate | "6h", "4h 30m", "2d", "1w" |
 
-### 📄 Example CSV Content
-```csv
-Summary,Original Estimate
-Install Minio cluster with 3 nodes by using Operator,3h
-Configure monitoring for production servers,4h
-Update SSL certificates,2h
-Deploy new version to staging environment,3h
-Setup backup automation,5h
+### 📄 Example YAML Content
+```yaml
+tasks:
+  - summary: "Install Minio cluster with 3 nodes by using Operator"
+    original_estimate: "3h"
+  - summary: "Configure monitoring for production servers"
+    original_estimate: "4h"
+  - summary: "Update SSL certificates"
+    original_estimate: "2h"
+  - summary: "Deploy new version to staging environment"
+    original_estimate: "3h"
+  - summary: "Setup backup automation"
+    original_estimate: "5h"
 ```
 
 ## 🔄 What the Script Does
 
-For each row in your CSV, the script:
+For each task in your YAML file, the script:
 
 1. 🎯 **Detects Parent**: Determines the correct parent issue based on filename
 2. 🆕 **Creates Sub-task**: Creates a new sub-task under the parent issue
@@ -105,7 +110,7 @@ For each row in your CSV, the script:
    - 👤 Assignee: Amirhossein Kamrani
    - 🏷️ Components: DevOps
    - 🏷️ Labels: DevOps
-   - ⏱️ Original Estimate: From CSV
+   - ⏱️ Original Estimate: From YAML
 4. 📝 **Logs Work**: Creates a work log with the same time as original estimate
 5. ✅ **Sets Status**: Changes the sub-task status to "Done"
 
@@ -114,8 +119,8 @@ For each row in your CSV, the script:
 | File | Description | 🔒 Security |
 |------|-------------|-------------|
 | `jira-subtask-creator.py` | 🐍 Main Python script | ✅ Safe to share |
-| `maintenance-subtasks.csv` | 📋 Example maintenance tasks | ✅ Safe to share |
-| `develop-subtasks.csv` | 📋 Example development tasks | ✅ Safe to share |
+| `maintenance-subtasks.yaml` | 📋 Example maintenance tasks | ✅ Safe to share |
+| `develop-subtasks.yaml` | 📋 Example development tasks | ✅ Safe to share |
 | `requirements.txt` | 📦 Python dependencies | ✅ Safe to share |
 | `.env` | 🔐 Your actual credentials | ❌ **KEEP PRIVATE!** |
 | `.env.example` | 📝 Template for credentials | ✅ Safe to share |
@@ -124,7 +129,7 @@ For each row in your CSV, the script:
 
 ## ✅ Test Results
 
-🎉 **Successfully tested with both CSV types!**
+🎉 **Successfully tested with both YAML types!**
 
 ### 🔧 Maintenance Test
 - ✅ Created sub-task: BM-****
@@ -179,8 +184,8 @@ cat .env
 
 ### ❌ File Not Found
 ```bash
-# Make sure your CSV file exists
-ls -la *.csv
+# Make sure your YAML file exists
+ls -la *.yaml
 
 # Check the filename contains 'maintenance' or 'develop'
 ```
